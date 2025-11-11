@@ -1,3 +1,5 @@
+import 'package:amazon_music_playlist_parser/screens/home_screen.dart';
+import 'package:amazon_music_playlist_parser/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -9,6 +11,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp();
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Playlist Parser',
+      theme: AppTheme.darkTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.dark,
+      home: const HomeScreen(),
+    );
   }
 }
