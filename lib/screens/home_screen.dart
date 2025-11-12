@@ -45,13 +45,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
             ElevatedButton(
               onPressed: () {
-                final url = _urlController;
-                if (url.text.isEmpty) return;
+                final url = _urlController.text;
+                if (url.isEmpty) return;
 
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const PlaylistScreen(),
+                    builder: (context) => PlaylistScreen(url: url),
                   ),
                 );
               },
