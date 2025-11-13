@@ -123,7 +123,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  leading: CircleAvatar(child: Icon(Icons.music_note)),
+                  leading: CircleAvatar(child: Image.network(_playlist!.imgUrl)),
                   tileColor: Theme.of(
                     context,
                   ).colorScheme.primary.withAlpha(26),
