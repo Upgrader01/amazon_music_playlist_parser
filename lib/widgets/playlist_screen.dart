@@ -15,7 +15,6 @@ class PlaylistScreen extends StatefulWidget {
 
 class _PlaylistScreenState extends State<PlaylistScreen> {
   final _parserService = PlaylistParserService();
-
   Playlist? _playlist;
   bool _isLoading = true;
   String? _error;
@@ -34,52 +33,37 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
           HiddenWebView(url: widget.url, onHtmlLoaded: _onHtmlReceived),
 
           if (_isLoading)
-            _buildLoadingState()
+            const Center(child: CircularProgressIndicator())
           else if (_error != null)
-            _buildErrorState()
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  "Error: $_error",
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
           else if (_playlist != null)
-            _buildContentState(),
+            Column(
+              children: [
+                PlaylistHeader(playlist: _playlist!),
+
+                Divider(color: Colors.grey[800], height: 1),
+
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _playlist!.songs.length,
+                    itemBuilder: (context, index) {
+                      return SongListItem(song: _playlist!.songs[index]);
+                    },
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
-    );
-  }
-
-  Widget _buildLoadingState() {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: const Center(child: CircularProgressIndicator()),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(
-          "Error: $_error",
-          style: const TextStyle(color: Colors.red),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContentState() {
-    return Column(
-      children: [
-        PlaylistHeader(playlist: _playlist!),
-
-        Divider(color: Colors.grey[800], height: 1),
-
-        Expanded(
-          child: ListView.builder(
-            itemCount: _playlist!.songs.length,
-            itemBuilder: (context, index) {
-              return SongListItem(song: _playlist!.songs[index]);
-            },
-          ),
-        ),
-      ],
     );
   }
 
