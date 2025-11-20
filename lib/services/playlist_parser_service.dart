@@ -7,25 +7,6 @@ class PlaylistParserService {
     try {
       final document = parser.parse(htmlContent);
 
-      String getHdImageUrl(String url) {
-        if (url.isEmpty) return '';
-        return url.replaceAll(RegExp(r'\._[a-zA-Z0-9,_-]+_'), '');
-      }
-
-      String cleanText(String text) {
-        String cleaned = text.replaceAll(
-          'Playlist on Amazon Music Unlimited',
-          '',
-        );
-
-        const cutOffPhrase = "Listen to the ";
-        if (cleaned.contains(cutOffPhrase)) {
-          cleaned = cleaned.split(cutOffPhrase).first;
-        }
-
-        return cleaned.trim();
-      }
-
       String playlistTitle = document.querySelector('title')?.text ?? '';
       String playlistDescription =
           document
@@ -48,35 +29,25 @@ class PlaylistParserService {
             '';
       }
 
-      playlistTitle = cleanText(playlistTitle);
-      playlistDescription = cleanText(playlistDescription);
+      playlistTitle = _cleanText(playlistTitle);
+      playlistDescription = _cleanText(playlistDescription);
       if (playlistTitle.isEmpty) playlistTitle = 'Unknown Playlist';
 
-      String rawImageUrl = '';
-
-      rawImageUrl =
+      String rawImageUrl =
           document
               .querySelector('meta[property="og:image"]')
               ?.attributes['content'] ??
           '';
 
       if (rawImageUrl.isEmpty) {
-        final regex = RegExp(
-          r'https://m\.media-amazon\.com/images/I/[a-zA-Z0-9._-]+\.jpg',
-        );
-        final matches = regex.allMatches(htmlContent);
-        for (final match in matches) {
-          final potentialUrl = match.group(0);
-          if (potentialUrl != null &&
-              !potentialUrl.contains('logo') &&
-              !potentialUrl.contains('410x82px')) {
-            rawImageUrl = potentialUrl;
-            break;
-          }
+        final regex = RegExp(r'https://m\.media-amazon\.com/images/I/[a-zA-Z0-9._-]+\.jpg');
+        final match = regex.firstMatch(htmlContent);
+        if (match != null) {
+          rawImageUrl = match.group(0)!;
         }
       }
 
-      final String imageUrl = getHdImageUrl(rawImageUrl);
+      final String imageUrl = _getHdImageUrl(rawImageUrl);
 
       List<Song> songs = [];
       final songElements = document.querySelectorAll('[primary-text]');
@@ -100,12 +71,11 @@ class PlaylistParserService {
 
           String duration = '--:--';
           final textContent = element.text;
-          final durationRegex = RegExp(r'\d+:\d{2}');
-          final match = durationRegex.firstMatch(textContent);
-          if (match != null) duration = match.group(0)!;
+          final timeMatch = RegExp(r'\d+:\d{2}').firstMatch(textContent);
+          if (timeMatch != null) duration = timeMatch.group(0)!;
 
           final String rawSongImage = attributes['image-src'] ?? '';
-          final String songImage = getHdImageUrl(rawSongImage);
+          final String songImage = _getHdImageUrl(rawSongImage);
 
           songs.add(
             Song(
@@ -130,5 +100,21 @@ class PlaylistParserService {
     } catch (e) {
       throw Exception('Error parsing HTML: $e');
     }
+  }
+
+  String _getHdImageUrl(String url) {
+    if (url.isEmpty) return '';
+    return url.replaceAll(RegExp(r'\._[a-zA-Z0-9,_-]+_'), '');
+  }
+
+  String _cleanText(String text) {
+    String cleaned = text.replaceAll('Playlist on Amazon Music Unlimited', '');
+
+    const cutOffPhrase = "Listen to the ";
+    if (cleaned.contains(cutOffPhrase)) {
+      cleaned = cleaned.split(cutOffPhrase).first;
+    }
+
+    return cleaned.trim();
   }
 }

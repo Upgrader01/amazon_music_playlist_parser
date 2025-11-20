@@ -22,15 +22,9 @@ class HiddenWebView extends StatelessWidget {
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
           javaScriptEnabled: true,
           domStorageEnabled: true,
-          thirdPartyCookiesEnabled: true,
-          mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
         ),
         onLoadStop: (controller, url) async {
-          await controller.evaluateJavascript(
-            source: "window.scrollTo(0, document.body.scrollHeight);",
-          );
-
-          await Future.delayed(const Duration(seconds: 3));
+          await Future.delayed(const Duration(seconds: 4));
 
           final html = await controller.getHtml();
           if (html != null) {
